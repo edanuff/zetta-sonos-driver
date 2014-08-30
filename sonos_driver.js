@@ -1,11 +1,11 @@
 var Device = require('zetta').Device;
 var util = require('util');
-var setTrack = function(self) {
+var setTrack = function(self, calledFromTransition) {
   self._sonos.currentTrack(function(err, track) {
     if(err) {
       return;
     } else {
-      if(track) {
+      if(track && track.position > 0 && calledFromTransition) {
         self.state = 'playing';
         self.track = track.title;
         self.artist = track.artist;
@@ -23,18 +23,18 @@ var currentState = function(self) {
 var SonosDriver = module.exports = function(sonos) {
   Device.call(this);
   this._sonos = sonos;
-  this.track = 'unk';
-  this.artist = 'unk';
+  this.track = '';
+  this.artist = '';
 };
 util.inherits(SonosDriver, Device);
 
 SonosDriver.prototype.init = function(config) {
   var self = this;
   config
-    .state('online')
+    .state('stopped')
     .type('sonos')
     .name(this._sonos.host)
-    .when('playing', { allow: ['stop', 'skip', 'play-uri'] })
+    .when('playing', { allow: ['stop', 'skip', 'play-uri', 'play'] })
     .when('stopped', { allow: 'play' })
     .when('paused', { allow: 'play'})
     .map('skip', this.skip)
@@ -45,7 +45,7 @@ SonosDriver.prototype.init = function(config) {
     .monitor('track');
     
   //poll the track every 3 seconds
-  setInterval(setTrack, 1000, self);
+  setTimeout(setTrack, 1000, self, false);
 //  setInterval(currentState, 1000, self);
 };
 
@@ -58,7 +58,10 @@ SonosDriver.prototype.play = function(cb) {
         cb(e);
       }
     } else {
-      setTrack(self);
+      setTrack(self, true);
+      if(cb) {
+        cb();
+      }
     }
   });
 };
@@ -72,7 +75,10 @@ SonosDriver.prototype.skip = function(cb) {
         cb(e);
       }
     } else {
-      setTrack(self);
+      setTrack(self, true);
+      if(cb) {
+        cb();
+      }
     }
   });
 };
@@ -89,6 +95,9 @@ SonosDriver.prototype.stop = function(cb) {
       self.state = 'stopped';
       self.track = '';
       self.artist = '';
+      if(cb) {
+        cb();
+      }
     }
   });
 };
@@ -102,7 +111,10 @@ SonosDriver.prototype.playUri = function(url, cb) {
         cb(e);
       }
     } else {
-      setTrack(self);
+      setTrack(self, true);
+      if(cb) {
+        cb();
+      }
     }
   });
 };

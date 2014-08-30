@@ -8,6 +8,7 @@ var setTrack = function(self) {
       if(track) {
         self.state = 'playing';
         self.track = track.title;
+        self.artist = track.artist;
       }
     }
   });
@@ -17,6 +18,7 @@ var SonosDriver = module.exports = function(sonos) {
   Device.call(this);
   this._sonos = sonos;
   this.track = 'unk';
+  this.artist = 'unk';
 };
 util.inherits(SonosDriver, Device);
 
@@ -32,6 +34,7 @@ SonosDriver.prototype.init = function(config) {
     .map('play', this.play)
     .map('stop', this.stop)
     .map('play-uri', this.playUri, [{ name:'endpoint', type:'url' }])
+    .monitor('artist')
     .monitor('track');
     
   //poll the track every 3 seconds
@@ -77,6 +80,7 @@ SonosDriver.prototype.stop = function(cb) {
     } else {
       self.state = 'stopped';
       self.track = '';
+      self.artist = '';
     }
   });
 };

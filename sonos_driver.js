@@ -14,6 +14,12 @@ var setTrack = function(self) {
   });
 };
 
+var currentState = function(self) {
+  self._sonos.getCurrentState(function(err, state) {
+    self.state = state;
+  });
+};
+
 var SonosDriver = module.exports = function(sonos) {
   Device.call(this);
   this._sonos = sonos;
@@ -30,6 +36,7 @@ SonosDriver.prototype.init = function(config) {
     .name(this._sonos.host)
     .when('playing', { allow: ['stop', 'skip', 'play-uri'] })
     .when('stopped', { allow: 'play' })
+    .when('paused', { allow: 'play'})
     .map('skip', this.skip)
     .map('play', this.play)
     .map('stop', this.stop)
@@ -38,7 +45,8 @@ SonosDriver.prototype.init = function(config) {
     .monitor('track');
     
   //poll the track every 3 seconds
-  setInterval(setTrack, 3000, self);
+  setInterval(setTrack, 1000, self);
+//  setInterval(currentState, 1000, self);
 };
 
 SonosDriver.prototype.play = function(cb) {

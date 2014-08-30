@@ -1,5 +1,17 @@
 var Device = require('zetta').Device;
 var util = require('util');
+var setTrack = function(self) {
+  self._sonos.currentTrack(function(err, track) {
+    if(err) {
+      return;
+    } else {
+      if(track) {
+        self.state = 'playing';
+        self.track = track.title;
+      }
+    }
+  });
+};
 
 var SonosDriver = module.exports = function(sonos) {
   Device.call(this);
@@ -14,27 +26,16 @@ SonosDriver.prototype.init = function(config) {
     .state('online')
     .type('sonos')
     .name(this._sonos.host)
-    .when('playing', { allow: ['stop', 'skip'] })
+    .when('playing', { allow: ['stop', 'skip', 'play-uri'] })
     .when('stopped', { allow: 'play' })
     .map('skip', this.skip)
     .map('play', this.play)
     .map('stop', this.stop)
+    .map('play-uri', this.playUri, [{ name:'endpoint', type:'url' }])
     .monitor('track');
     
   //poll the track every 3 seconds
-  setInterval(function() {
-    self._sonos.currentTrack(function(err, track) {
-      if(err) {
-        return;
-      } else {
-        if(track) {
-          self.state = 'playing';
-          self.track = track.title;
-        }
-      }
-    });
-
-  }, 3000);
+  setInterval(setTrack, 3000, self);
 };
 
 SonosDriver.prototype.play = function(cb) {
@@ -46,8 +47,7 @@ SonosDriver.prototype.play = function(cb) {
         cb(e);
       }
     } else {
-      self.state = 'playing';
-      self.track = playing.title;
+      setTrack(self);
     }
   });
 };
@@ -61,8 +61,7 @@ SonosDriver.prototype.skip = function(cb) {
         cb(e);
       }
     } else {
-      self.state = 'playing';
-      self.track = playing.title;
+      setTrack(self);
     }
   });
 };
@@ -78,6 +77,20 @@ SonosDriver.prototype.stop = function(cb) {
     } else {
       self.state = 'stopped';
       self.track = '';
+    }
+  });
+};
+
+SonosDriver.prototype.playUri = function(url, cb) {
+  var self = this;
+  this._sonos.play(url, function(err, playing) {
+    if(e) {
+      console.log(e);
+      if(cb) {
+        cb(e);
+      }
+    } else {
+      setTrack(self);
     }
   });
 };

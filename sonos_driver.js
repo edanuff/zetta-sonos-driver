@@ -7,8 +7,12 @@ var setTrack = function(self, calledFromTransition) {
     } else {
       if((track && track.position > 0) || calledFromTransition) {
         self.state = 'playing';
-        self.track = track.title;
-        self.artist = track.artist;
+        if(self.track !== track.title) {
+          self.track = track.title;
+        }
+        if(self.artist !== track.artist) {
+          self.artist = track.artist;
+        }
       } else {
         self.state = 'stopped';
         self.track = '';

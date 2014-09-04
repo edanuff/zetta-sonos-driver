@@ -9,6 +9,10 @@ var setTrack = function(self, calledFromTransition) {
         self.state = 'playing';
         self.track = track.title;
         self.artist = track.artist;
+      } else {
+        self.state = 'stopped';
+        self.track = '';
+        self.artist = '';
       }
     }
   });

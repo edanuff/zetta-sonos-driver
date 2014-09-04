@@ -3,7 +3,9 @@ module.exports = function(server) {
 
   server.observe(sonosQuery, function(sonos) {
     sonos.streams.track.on('data', function(message) {
-      console.log('Current track:', message.data);
+      if(message.data !== '') {
+        console.log('Current track:', message.data);
+      }
     });
   });
 };

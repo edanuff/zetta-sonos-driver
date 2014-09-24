@@ -1,5 +1,5 @@
 var sonos = require('sonos');
-var Scout = require('zetta').Scout;
+var Scout = require('zetta-scout');
 var util = require('util');
 var SonosDriver = require('./sonos_driver');
 

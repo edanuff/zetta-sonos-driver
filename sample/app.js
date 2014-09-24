@@ -5,6 +5,7 @@ module.exports = function(server) {
     sonos.streams.track.on('data', function(message) {
       if(message.data !== '') {
         console.log('Current track:', message.data);
+        console.log('Current artist:', sonos.artist);
       }
     });
   });

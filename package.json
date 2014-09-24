@@ -9,7 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "zetta": "^0.7.0",
-    "sonos": "^0.6.1"
+    "zetta": "^0.11.0",
+    "sonos": "^0.6.1",
+    "zetta-device": "^0.3.0",
+    "zetta-scout": "^0.3.0"
   }
 }

@@ -1,4 +1,4 @@
-var Device = require('zetta').Device;
+var Device = require('zetta-device');
 var util = require('util');
 var setTrack = function(self, calledFromTransition) {
   self._sonos.currentTrack(function(err, track) {
@@ -8,12 +8,10 @@ var setTrack = function(self, calledFromTransition) {
       if((track && track.position > 0) || calledFromTransition) {
         self.state = 'playing';
         if(self.track !== track.title) {
+          self.artist = track.artist;
           self.track = track.title;
         }
-        if(self.artist !== track.artist) {
-          self.artist = track.artist;
-        }
-      } else {
+     } else {
         self.state = 'stopped';
         self.track = '';
         self.artist = '';

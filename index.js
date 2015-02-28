@@ -12,6 +12,6 @@ SonosScout.prototype.init = function(next) {
   var self = this;
   sonos.search(function(device) {
     self.discover(SonosDriver, device);
-    next();
   });
+  next();
 };
